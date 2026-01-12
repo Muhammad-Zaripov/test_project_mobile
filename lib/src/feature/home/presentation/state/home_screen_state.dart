@@ -1,5 +1,6 @@
 import 'package:database/database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../../../common/service/calendar_service.dart';
 import '../../data/enums/calendar_view_mode.dart';
 import '../../data/model/event_model.dart';
@@ -13,6 +14,7 @@ abstract class HomeScreenState extends State<HomeScreen> {
   late DateTime? selectedDate;
   late final CalendarService calendarService;
   CalendarViewMode viewMode = CalendarViewMode.month;
+  final years = List.generate(2950 - 1950 + 1, (i) => 1950 + i);
 
   List<String> get months => const [
     'January',
@@ -34,24 +36,58 @@ abstract class HomeScreenState extends State<HomeScreen> {
   void onPrevious() {
     setState(() {
       currentDate = DateTime(currentDate.year, currentDate.month + 1);
-      selectedDate = null;
+      selectedDate = DateTime(currentDate.year, currentDate.month, 1);
     });
 
-    eventBloc.add(ClearFilter());
+    eventBloc
+      ..add(FilterByDate(selectedDate!))
+      ..add(ClearFilter());
   }
 
   void onNext() {
     setState(() {
       currentDate = DateTime(currentDate.year, currentDate.month - 1);
-      selectedDate = null;
+
+      selectedDate = DateTime(currentDate.year, currentDate.month, 1);
     });
 
-    eventBloc.add(ClearFilter());
+    eventBloc
+      ..add(FilterByDate(selectedDate!))
+      ..add(ClearFilter());
   }
 
   void onDaySelected(DateTime date) {
     setState(() => selectedDate = date);
     eventBloc.add(FilterByDate(date));
+  }
+
+  Map<String, String> monthMap = {
+    'января': 'January',
+    'февраля': 'February',
+    'марта': 'March',
+    'апреля': 'April',
+    'мая': 'May',
+    'июня': 'June',
+    'июля': 'July',
+    'августа': 'August',
+    'сентября': 'September',
+    'октября': 'October',
+    'ноября': 'November',
+    'декабря': 'December',
+  };
+
+  String formattedDate() {
+    final date = selectedDate ?? DateTime.now();
+
+    var text = DateFormat('d MMMM yyyy').format(date);
+
+    monthMap.forEach((ru, en) {
+      if (text.contains(ru)) {
+        text = text.replaceAll(ru, en);
+      }
+    });
+
+    return text;
   }
 
   String todayWeekday() {
@@ -79,11 +115,16 @@ abstract class HomeScreenState extends State<HomeScreen> {
 
   void openMonthView(int year) {
     setState(() {
-      currentDate = DateTime(year, 1);
-      selectedDate = null;
+      final base = selectedDate ?? DateTime.now();
+
+      selectedDate = DateTime(year, base.month, base.day);
+
+      currentDate = DateTime(year, base.month);
+
       viewMode = CalendarViewMode.month;
     });
-    eventBloc.add(ClearFilter());
+
+    eventBloc.add(FilterByDate(selectedDate!));
   }
 
   @override
