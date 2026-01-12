@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../common/constant/gen/assets.gen.dart';
 import '../../../../common/extension/context_extension.dart';
 import '../../../../common/router/routes.dart';
 import '../../../../common/util/dimension.dart';
@@ -25,6 +26,7 @@ class _HomeScreenState extends HomeScreenState {
       backgroundColor: context.color.white,
 
       appBar: AppBar(
+        actions: [Padding(padding: Dimension.pRight16, child: Assets.icons.notification.svg())],
         centerTitle: true,
         backgroundColor: context.color.white,
         title: Column(
