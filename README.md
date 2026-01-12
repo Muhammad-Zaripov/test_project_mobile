@@ -1,4 +1,4 @@
-## udevs_initial_project
+## initial_project_mobile
 
 ## Table of Contents
 - [Project overview](#project-overview)
