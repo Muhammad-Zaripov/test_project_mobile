@@ -29,14 +29,14 @@ class _AddScreenState extends AddScreenState {
           const Text('Event name'),
           CustomTextField(controller: titleController),
           Dimension.hBox16,
-          const Text('Subtitle'),
+          const Text('Event subtitle'),
           CustomTextField(controller: subtitleController),
           Dimension.hBox16,
-          const Text('Description'),
+          const Text('Event description'),
           CustomTextField(controller: descriptionController, minLines: 4, maxLines: 4),
           Dimension.hBox16,
-          const Text('Location'),
-          CustomTextField(controller: locationController, location: true),
+          const Text('Event location'),
+          CustomTextField(controller: locationController, location: true, onLocationTap: getCurrentLocation),
           Dimension.hBox16,
           const Text('Priority color'),
           Dimension.hBox4,
@@ -52,7 +52,7 @@ class _AddScreenState extends AddScreenState {
                   SizedBox(
                     width: 20,
                     height: 20,
-                    child: DecoratedBox(decoration: BoxDecoration(color: selectedStatus.color.withValues(alpha: 0.2))),
+                    child: DecoratedBox(decoration: BoxDecoration(color: selectedStatus.color)),
                   ),
 
                   PopupMenuButton<EventStatus>(
@@ -84,8 +84,8 @@ class _AddScreenState extends AddScreenState {
           ),
 
           Dimension.hBox16,
-          const Text('Time (HH:mm)'),
-          CustomTextField(controller: timeController),
+          const Text('Event time'),
+          CustomTextField(controller: timeController, onTap: pickTime, readOnly: true),
         ],
       ),
     ),

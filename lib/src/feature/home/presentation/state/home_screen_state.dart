@@ -1,12 +1,11 @@
 import 'package:database/database.dart';
 import 'package:flutter/material.dart';
-
+import '../../../../common/service/calendar_service.dart';
 import '../../data/enums/calendar_view_mode.dart';
 import '../../data/model/event_model.dart';
 import '../../data/repository/home_repository.dart';
 import '../blocs/event_bloc/event_bloc.dart';
 import '../screen/home_screen.dart';
-import '../../../../common/service/calendar_service.dart';
 
 abstract class HomeScreenState extends State<HomeScreen> {
   late final EventBloc eventBloc;
@@ -14,7 +13,6 @@ abstract class HomeScreenState extends State<HomeScreen> {
   late DateTime? selectedDate;
   late final CalendarService calendarService;
   CalendarViewMode viewMode = CalendarViewMode.month;
-  final yearCounts = <int, int>{};
 
   List<String> get months => const [
     'January',
@@ -33,25 +31,22 @@ abstract class HomeScreenState extends State<HomeScreen> {
 
   List<String> get weekDays => const ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
 
-  @override
-  void initState() {
-    super.initState();
-    eventBloc = EventBloc(EventRepositoryImpl(Database()))..add(GetEvent());
-    currentDate = DateTime.now();
-    selectedDate = DateTime.now();
-    calendarService = CalendarService();
-  }
-
   void onPrevious() {
     setState(() {
-      currentDate = DateTime(currentDate.year, currentDate.month - 1);
+      currentDate = DateTime(currentDate.year, currentDate.month + 1);
+      selectedDate = null;
     });
+
+    eventBloc.add(ClearFilter());
   }
 
   void onNext() {
     setState(() {
-      currentDate = DateTime(currentDate.year, currentDate.month + 1);
+      currentDate = DateTime(currentDate.year, currentDate.month - 1);
+      selectedDate = null;
     });
+
+    eventBloc.add(ClearFilter());
   }
 
   void onDaySelected(DateTime date) {
@@ -61,7 +56,6 @@ abstract class HomeScreenState extends State<HomeScreen> {
 
   String todayWeekday() {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
     final now = DateTime.now();
     return days[now.weekday % 7];
   }
@@ -86,10 +80,18 @@ abstract class HomeScreenState extends State<HomeScreen> {
   void openMonthView(int year) {
     setState(() {
       currentDate = DateTime(year, 1);
-      selectedDate = DateTime(year, 1, 1);
+      selectedDate = null;
       viewMode = CalendarViewMode.month;
     });
+    eventBloc.add(ClearFilter());
+  }
 
-    eventBloc.add(FilterByDate(selectedDate!));
+  @override
+  void initState() {
+    super.initState();
+    eventBloc = EventBloc(EventRepositoryImpl(Database()))..add(GetEvent());
+    currentDate = DateTime.now();
+    selectedDate = DateTime.now();
+    calendarService = CalendarService();
   }
 }

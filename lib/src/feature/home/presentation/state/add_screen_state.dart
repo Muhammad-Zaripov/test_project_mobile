@@ -1,6 +1,8 @@
 import 'package:database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import '../../../../common/extension/context_extension.dart';
 import '../../data/enums/event_status.dart';
@@ -40,7 +42,6 @@ abstract class AddScreenState extends State<AddScreen> {
 
     final event = EventModel(
       id: widget.event?.id,
-
       title: titleController.text,
       subtitle: subtitleController.text,
       description: descriptionController.text,
@@ -59,6 +60,56 @@ abstract class AddScreenState extends State<AddScreen> {
     if (mounted) context.pop();
   }
 
+  Future<void> pickTime() async {
+    final initial = timeController.text.isNotEmpty ? _parseTime(timeController.text) : TimeOfDay.now();
+
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: initial,
+      builder: (context, child) =>
+          MediaQuery(data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true), child: child!),
+    );
+    if (picked == null) return;
+    final formatted = '${picked.hour.toString()}:${picked.minute.toString()}';
+    setState(() {
+      timeController.text = formatted;
+    });
+  }
+
+  TimeOfDay _parseTime(String value) {
+    final parts = value.split(':');
+    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+  }
+
+  Future<void> getCurrentLocation() async {
+    var permission = await Geolocator.checkPermission();
+    if (permission == .denied) {
+      permission = await Geolocator.requestPermission();
+    }
+
+    if (permission == .denied || permission == .deniedForever) {
+      return;
+    }
+
+    final position = await Geolocator.getCurrentPosition(desiredAccuracy: .high);
+
+    final placemark = await placemarkFromCoordinates(position.latitude, position.longitude);
+
+    if (placemark.isEmpty) return;
+
+    final place = placemark.first;
+
+    final address = [
+      place.locality,
+      // place.subLocality,
+      place.street,
+    ].where((e) => e != null && e.isNotEmpty).join(', ');
+
+    setState(() {
+      locationController.text = address;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -71,7 +122,7 @@ abstract class AddScreenState extends State<AddScreen> {
       text: widget.event != null ? DateFormat('HH:mm').format(widget.event!.endTime) : '',
     );
 
-    selectedStatus = widget.event?.status ?? EventStatus.danger;
+    selectedStatus = widget.event?.status ?? .danger;
   }
 
   @override

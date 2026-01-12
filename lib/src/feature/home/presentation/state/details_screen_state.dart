@@ -5,7 +5,7 @@ import '../blocs/event_bloc/event_bloc.dart';
 import '../screen/details_screen.dart';
 
 abstract class DetailsScreenState extends State<DetailScreen> {
-  Future<void> onTap() async {
+  Future<void> onDeleteTap() async {
     final id = widget.eventId;
 
     context.read<EventBloc>().add(DeleteEvent(id));

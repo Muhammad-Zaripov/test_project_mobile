@@ -58,7 +58,11 @@ class EventCard extends StatelessWidget {
                       Row(
                         spacing: 4,
                         children: [
-                          Assets.vectors.location.svg(width: 18, height: 18, color: event.color),
+                          Assets.vectors.location.svg(
+                            width: 18,
+                            height: 18,
+                            colorFilter: ColorFilter.mode(event.color, .srcATop),
+                          ),
                           Text(event.location, style: context.textTheme.workSansW400s10.copyWith(color: event.color)),
                         ],
                       ),

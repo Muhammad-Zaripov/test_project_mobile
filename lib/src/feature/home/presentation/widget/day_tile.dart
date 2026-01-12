@@ -12,9 +12,13 @@ class DayTile extends StatelessWidget {
     required this.onDaySelected,
     required this.dots,
     super.key,
+    this.isPreviousMonth = false,
+    this.isNextMonth = false,
   });
 
   final int day;
+  final bool isPreviousMonth;
+  final bool isNextMonth;
   final DateTime currentDate;
   final DateTime? selectedDate;
   final CalendarService calendarService;
@@ -23,47 +27,60 @@ class DayTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final date = DateTime(currentDate.year, currentDate.month, day);
+    final date = isPreviousMonth
+        ? DateTime(currentDate.year, currentDate.month - 1, day)
+        : isNextMonth
+        ? DateTime(currentDate.year, currentDate.month + 1, day)
+        : DateTime(currentDate.year, currentDate.month, day);
 
+    final isToday = calendarService.isSameDay(date, DateTime.now());
     final isSelected = selectedDate != null && calendarService.isSameDay(date, selectedDate!);
+    final isCurrentMonth = !isPreviousMonth && !isNextMonth;
 
     return GestureDetector(
-      onTap: () => onDaySelected(date),
-      child: Column(
-        mainAxisAlignment: .center,
-        children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
-              shape: .circle,
-              color: isSelected ? context.color.blue : context.color.transparent,
+      onTap: isCurrentMonth ? () => onDaySelected(date) : null,
+      child: Opacity(
+        opacity: isCurrentMonth ? 1 : 0.35,
+        child: Column(
+          mainAxisAlignment: .center,
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                shape: .circle,
+                color: isSelected ? context.color.blue : Colors.transparent,
+                border: isToday && !isSelected ? Border.all(color: context.color.blue, width: 1) : null,
+              ),
+              alignment: .center,
+              child: Text(
+                day.toString(),
+                style: TextStyle(
+                  color: isSelected ? Colors.white : context.color.black,
+                  fontWeight: isToday ? .w600 : .w400,
+                ),
+              ),
             ),
-            alignment: .center,
-            child: Text('$day', style: TextStyle(color: isSelected ? context.color.white : context.color.black)),
-          ),
-          Dimension.hBox4,
-          if (dots.isNotEmpty)
-            Row(
-              mainAxisAlignment: .center,
-              children: dots
-                  .toSet()
-                  .take(3)
-                  .map(
-                    (c) => SizedBox(
-                      width: 6,
-                      height: 6,
-                      child: Padding(
-                        padding: Dimension.pAll1,
+            Dimension.hBox4,
+            if (dots.isNotEmpty)
+              Row(
+                spacing: 2,
+                mainAxisAlignment: .center,
+                children: dots
+                    .take(3)
+                    .map(
+                      (c) => SizedBox(
+                        width: 5,
+                        height: 5,
                         child: DecoratedBox(
                           decoration: BoxDecoration(color: c, shape: .circle),
                         ),
                       ),
-                    ),
-                  )
-                  .toList(),
-            ),
-        ],
+                    )
+                    .toList(),
+              ),
+          ],
+        ),
       ),
     );
   }

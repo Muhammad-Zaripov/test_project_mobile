@@ -10,7 +10,6 @@ import '../state/details_screen_state.dart';
 
 class DetailScreen extends StatefulWidget {
   const DetailScreen({required this.eventId, super.key});
-
   final int eventId;
 
   @override
@@ -144,7 +143,7 @@ class _DetailScreenState extends DetailsScreenState {
         bottomNavigationBar: Padding(
           padding: Dimension.pAll16.copyWith(bottom: 40),
           child: InkWell(
-            onTap: onTap,
+            onTap: onDeleteTap,
             child: SizedBox(
               width: double.infinity,
               child: DecoratedBox(

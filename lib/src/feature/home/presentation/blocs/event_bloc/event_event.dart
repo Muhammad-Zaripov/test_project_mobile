@@ -1,8 +1,10 @@
 part of 'event_bloc.dart';
 
-abstract class EventBlocEvent {}
+sealed class EventBlocEvent {}
 
-class GetEvent extends EventBlocEvent {}
+final class GetEvent extends EventBlocEvent {}
+
+class ClearFilter extends EventBlocEvent {}
 
 class FilterByDate extends EventBlocEvent {
   FilterByDate(this.date);

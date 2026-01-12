@@ -1,12 +1,12 @@
 part of 'event_bloc.dart';
 
-class EventBlocState {
+class EventBlocState extends Equatable {
   const EventBlocState({this.status = .initial, this.events = const [], this.allEvents = const [], this.detailResult});
 
   final Status status;
-
+  //tanlangan kundagi eventlar
   final List<EventModel> events;
-
+  //barcha eventlar
   final List<EventModel> allEvents;
 
   final DetailResult? detailResult;
@@ -22,4 +22,7 @@ class EventBlocState {
     allEvents: allEvents ?? this.allEvents,
     detailResult: detailResult ?? this.detailResult,
   );
+
+  @override
+  List<Object?> get props => [status, events, detailResult];
 }

@@ -87,6 +87,7 @@ class _HomeScreenState extends HomeScreenState {
 
   Widget _buildYearView(BuildContext context) => BlocBuilder<EventBloc, EventBlocState>(
     builder: (context, state) {
+      final yearCounts = <int, int>{};
       for (final e in state.allEvents) {
         yearCounts.update(e.startTime.year, (v) => v + 1, ifAbsent: () => 1);
       }
