@@ -58,11 +58,11 @@ class _HomeScreenState extends HomeScreenState {
                         return InkWell(
                           borderRadius: Dimension.rAll8,
                           onTap: () {
-                            context.pop();
                             openMonthView(year);
+                            Navigator.of(context, rootNavigator: true).pop();
                           },
                           child: DecoratedBox(
-                            decoration: BoxDecoration(color: context.color.grey, borderRadius: Dimension.rAll8),
+                            decoration: const BoxDecoration(borderRadius: Dimension.rAll10),
                             child: Center(child: Text(year.toString(), style: context.textTheme.workSansW600s14)),
                           ),
                         );
